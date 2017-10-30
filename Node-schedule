@@ -1,0 +1,42 @@
+var mailreport = require('./mailreport');
+var moment = require('moment');
+moment().local();
+
+var cron = require('node-schedule');
+var rule = new cron.RecurrenceRule();
+
+ rule.dayOfWeek  = [0,1,2,3,4,5,6];
+
+ rule.minute = 58;
+ rule.hour = 23;
+
+var start = moment().startOf('day').format(); // set to 12:00 am today
+var end = moment().endOf('day').format(); // set to 23:59 pm today
+
+module.exports = function (Event) {
+
+    cron.scheduleJob(rule, function () {
+       
+        
+        Event.find({
+            
+                 "start": 
+    {
+        $gte: start, $lt: end
+    },
+            "cancelled":false
+
+                 }, function (err, result) {
+            if (err) throw err;
+            if (!result) {
+                console.log('No events to send reminder for');
+            } else {
+                console.log("Cron did its job!");
+                console.log("Start of Day: " + start);
+                console.log(result);
+                mailreport(result);
+
+            }
+        });
+    });
+};

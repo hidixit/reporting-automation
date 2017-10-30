@@ -1,0 +1,75 @@
+var nodemailer = require('nodemailer');
+var moment = require('moment');
+moment().local();
+
+
+var text = "";
+var text1 = "";
+var text2 = "";
+var text3 = "";
+var text4 = "";
+var text5 = "";
+var i = 0;
+var z = 0;
+var day = moment().format('dddd');
+var theBody = "";
+module.exports = function (result) {
+
+    try {
+        var transporter = nodemailer.createTransport({
+            host: 'inner-relay-3.corp.adobe.com',
+            port: 25
+        });
+
+
+        theBody = "<div style=\"font-family:sans-serif; font-size:11pt; width:50em;\"><p><strong>Hi, <br/> <br/>Below is the daily support summary of callbacks booked today.</strong></p></div><table style=\"border: 1px solid black;background-color:#FFFAFA; border-collapse: collapse;\"> <thead> <tr style=\"text-align:center;font-family:sans-serif;font-size:11pt;width:50em;\"><th style=\"border: 1px solid black;\">Name of caller</th><th style=\"border: 1px solid black;\">Report's To</th><th style=\"border: 1px solid black;\">Case No.</th><th style=\"border: 1px solid black;\">Booked At</th> <th style=\"border: 1px solid black;\">If marked done till 23.59 (T/F)</th></tr></thead><tbody>";
+
+        for (i = 0; i < result.length; i++) {
+
+           /* result[i].title + "<br/>";
+            result[i].caller.name + "<br/>";
+            moment(result[i].start).format("HH:mm") + "<br/>";
+            result[i].done + "<br/>";
+            result[i].caller.mname + "<br/>";   */
+
+            theBody += "<tr style=\"text-align:center;font-family:sans-serif;font-size:11pt;width:50em\"><td style=\"border: 1px solid black;background-color:#FFFAFA;\">" + result[i].caller.name + "<br/>" + "</td><td style=\"border: 1px solid black;background-color:#FFFAFA;\">" + result[i].caller.mname + "<br/>" + "</td><td style=\"border: 1px solid black;background-color:#FFFAFA;\">" + result[i].title + "<br/>" + "</td></td><td style=\"border: 1px solid black;background-color:#FFFAFA;\">" + moment(result[i].start).format("HH:mm") + "<br/>" + "</td></td><td style=\"border: 1px solid black;background-color:#FFFAFA;\"><strong>" + result[i].done + "<br/>" + "</strong></td></tr>";
+z++;
+        }
+
+        theBody += "</tbody></table><div style=\"font-family:sans-serif; font-size:11pt; width:50em;\"><p>Report shows list of Callbacks which were booked today.</p> <hr> <p><strong>Note: </strong>This is a system generated email. Please do not reply.</p></div>";
+
+
+        if (z == 0) {
+
+            theBody = "<div style=\"font-family:sans-serif; font-size:11pt; width:50em;\">" +
+                "<p><strong>No Data to display since, no callbacks were scheduled for today.</strong></p></div>";
+
+        }
+
+        var mailOptions = {
+            from: '"Callback Scheduler" <scheduler@adobe.com>', // sender address
+            to: "arattan@adobe.com,arkapoor@adobe.com,manikuma@adobe.com,manishm@adobe.com,shasija@adobe.com,svatsa@adobe.com,vimahaja@adobe.com,dwivedi@adobe.com", // list of receivers 
+            cc: "singhrag@adobe.com",
+         //     to:"dev28554@gmail.com",
+            bcc: "hidixit@adobe.com,gaaggarw@adobe.com,gasharm@adobe.com",
+            subject: "Daily support summary of callback scheduler for" + " " + moment().format('dddd') + " " + "and the count was:" + " " + z,
+            html: theBody // html body
+
+        };
+
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Message sent: ' + info.response + " at " + moment().format());
+
+            }
+        });
+    } catch (err) {
+        console.log(err);
+    } finally {
+
+
+    }
+
+};
